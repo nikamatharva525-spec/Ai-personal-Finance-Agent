@@ -1,108 +1,102 @@
 import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   FaHome,
   FaWallet,
   FaChartPie,
-  FaPiggyBank,
+  FaBullseye,
   FaRobot,
   FaCog,
   FaSignOutAlt,
 } from "react-icons/fa";
 
+const menuItems = [
+  {
+    title: "Dashboard",
+    icon: <FaHome />,
+    path: "/",
+  },
+  {
+    title: "Transactions",
+    icon: <FaWallet />,
+    path: "/transactions",
+  },
+  {
+    title: "Analytics",
+    icon: <FaChartPie />,
+    path: "/analytics",
+  },
+  {
+    title: "Budget Planner",
+    icon: <FaBullseye />,
+    path: "/budget",
+  },
+  {
+    title: "AI Advisor",
+    icon: <FaRobot />,
+    path: "/advisor",
+  },
+  {
+    title: "Settings",
+    icon: <FaCog />,
+    path: "/settings",
+  },
+];
+
 const Sidebar = () => {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/login");
-  };
-
   return (
-    <div className="fixed top-0 left-0 h-screen w-64 bg-gradient-to-b from-blue-700 to-blue-900 text-white shadow-2xl flex flex-col">
+    <motion.div
+      initial={{ x: -100 }}
+      animate={{ x: 0 }}
+      transition={{ duration: 0.6 }}
+      className="fixed left-0 top-0 w-64 h-screen bg-[#0B1120] border-r border-white/10 text-white flex flex-col justify-between"
+    >
+      <div>
+        {/* Logo */}
+        <div className="p-8">
+          <h1 className="text-3xl font-bold text-purple-500">
+            FinanceHub
+          </h1>
+        </div>
 
-      {/* Logo */}
-      <div className="p-6 border-b border-blue-500">
-        <h1 className="text-2xl font-bold">
-          💰 Finance AI
-        </h1>
-
-        <p className="text-blue-200 text-sm mt-1">
-          Personal Finance Agent
-        </p>
+        {/* Menu */}
+        <div className="px-4 space-y-3">
+          {menuItems.map((item, index) => (
+            <NavLink
+              key={index}
+              to={item.path}
+              end={item.path === "/"}
+            >
+              {({ isActive }) => (
+                <motion.div
+                  whileHover={{ x: 8 }}
+                  className={`flex items-center gap-4 p-4 rounded-xl cursor-pointer transition-all duration-300 ${
+                    isActive
+                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
+                      : "hover:bg-white/10 text-gray-300"
+                  }`}
+                >
+                  <span className="text-xl">{item.icon}</span>
+                  <span>{item.title}</span>
+                </motion.div>
+              )}
+            </NavLink>
+          ))}
+        </div>
       </div>
-
-      {/* Menu */}
-      <nav className="flex-1 p-4">
-
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            `flex items-center gap-3 p-3 rounded-lg mb-2 transition ${
-              isActive
-                ? "bg-white text-blue-700 font-semibold"
-                : "hover:bg-blue-600"
-            }`
-          }
-        >
-          <FaHome />
-          Dashboard
-        </NavLink>
-
-        <NavLink
-          to="/dashboard"
-          className="flex items-center gap-3 p-3 rounded-lg mb-2 hover:bg-blue-600 transition"
-        >
-          <FaWallet />
-          Expenses
-        </NavLink>
-
-        <NavLink
-          to="/dashboard"
-          className="flex items-center gap-3 p-3 rounded-lg mb-2 hover:bg-blue-600 transition"
-        >
-          <FaChartPie />
-          Analytics
-        </NavLink>
-
-        <NavLink
-          to="/dashboard"
-          className="flex items-center gap-3 p-3 rounded-lg mb-2 hover:bg-blue-600 transition"
-        >
-          <FaPiggyBank />
-          Savings
-        </NavLink>
-
-        <NavLink
-          to="/dashboard"
-          className="flex items-center gap-3 p-3 rounded-lg mb-2 hover:bg-blue-600 transition"
-        >
-          <FaRobot />
-          AI Advisor
-        </NavLink>
-
-        <NavLink
-          to="/dashboard"
-          className="flex items-center gap-3 p-3 rounded-lg mb-2 hover:bg-blue-600 transition"
-        >
-          <FaCog />
-          Settings
-        </NavLink>
-
-      </nav>
 
       {/* Logout */}
-      <div className="p-4 border-t border-blue-500">
-        <button
-          onClick={handleLogout}
-          className="w-full bg-red-500 hover:bg-red-600 p-3 rounded-lg flex items-center justify-center gap-2 transition"
+      <div className="p-4">
+        <motion.div
+          whileHover={{ x: 8 }}
+          className="flex items-center gap-4 p-4 rounded-xl cursor-pointer hover:bg-red-500/20 text-red-400"
         >
           <FaSignOutAlt />
-          Logout
-        </button>
+          <span>Logout</span>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

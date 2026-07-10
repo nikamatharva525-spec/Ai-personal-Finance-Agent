@@ -1,100 +1,70 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
-  FaSearch,
   FaBell,
-  FaMoon,
+  FaSearch,
   FaUserCircle,
-  FaSignOutAlt,
 } from "react-icons/fa";
 
 const Navbar = () => {
-  const navigate = useNavigate();
-
-  // Get logged-in user
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    navigate("/login");
-  };
-
   return (
-    <nav className="bg-white shadow-lg rounded-2xl px-8 py-4 flex justify-between items-center">
-
-      {/* Left Side */}
+    <motion.div
+      initial={{ y: -40, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6 }}
+      className="h-20 px-8 bg-[#0F172A] border-b border-white/10 flex items-center justify-between"
+    >
+      {/* Left */}
       <div>
-        <h1 className="text-3xl font-bold text-blue-600">
-          💰 AI Personal Finance Agent
-        </h1>
+        <h2 className="text-3xl font-bold text-white">
+          Dashboard
+        </h2>
 
-        <p className="text-gray-500 mt-1">
-          Welcome back,{" "}
-          <span className="font-semibold text-gray-700">
-            {user?.name || "Atharva"}
-          </span>{" "}
-          👋
+        <p className="text-gray-400 text-sm">
+          Welcome back 👋
         </p>
       </div>
 
-      {/* Right Side */}
-      <div className="flex items-center gap-5">
+      {/* Right */}
+      <div className="flex items-center gap-6">
 
-        {/* Search Box */}
+        {/* Search */}
         <div className="relative">
-          <FaSearch className="absolute left-3 top-3 text-gray-400" />
+          <FaSearch className="absolute left-4 top-4 text-gray-400" />
 
           <input
             type="text"
             placeholder="Search..."
-            className="pl-10 pr-4 py-2 w-64 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="pl-12 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
 
         {/* Notification */}
-        <button
-          className="text-2xl text-gray-600 hover:text-blue-600 transition"
-          title="Notifications"
+        <motion.div
+          whileHover={{ scale: 1.1 }}
+          className="relative cursor-pointer"
         >
-          <FaBell />
-        </button>
+          <FaBell
+            size={22}
+            className="text-white"
+          />
 
-        {/* Dark Mode */}
-        <button
-          className="text-2xl text-gray-600 hover:text-yellow-500 transition"
-          title="Dark Mode"
-        >
-          <FaMoon />
-        </button>
+          <span className="absolute -top-2 -right-2 w-3 h-3 bg-red-500 rounded-full"></span>
+        </motion.div>
 
         {/* User */}
-        <div className="flex items-center gap-3">
-          <FaUserCircle className="text-5xl text-blue-600" />
-
-          <div>
-            <h3 className="font-semibold text-gray-800">
-              {user?.name || "Atharva"}
-            </h3>
-
-            <p className="text-sm text-gray-500">
-              Finance User
-            </p>
-          </div>
-        </div>
-
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
+        <motion.div
+          whileHover={{ scale: 1.1 }}
+          className="cursor-pointer"
         >
-          <FaSignOutAlt />
-          Logout
-        </button>
+          <FaUserCircle
+            size={38}
+            className="text-purple-400"
+          />
+        </motion.div>
 
       </div>
-    </nav>
+    </motion.div>
   );
 };
 

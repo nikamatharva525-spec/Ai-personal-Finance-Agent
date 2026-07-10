@@ -1,158 +1,82 @@
-import React, { useEffect, useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
-import {
-  getExpenses,
-  deleteExpense,
-} from "../../api/expenseApi";
+import React from "react";
+import { motion } from "framer-motion";
+
+const transactions = [
+  {
+    id: 1,
+    date: "02 Jul",
+    category: "Food",
+    amount: "₹450",
+    type: "Expense",
+  },
+  {
+    id: 2,
+    date: "01 Jul",
+    category: "Fuel",
+    amount: "₹900",
+    type: "Expense",
+  },
+  {
+    id: 3,
+    date: "30 Jun",
+    category: "Salary",
+    amount: "₹40,000",
+    type: "Income",
+  },
+  {
+    id: 4,
+    date: "28 Jun",
+    category: "Shopping",
+    amount: "₹2,100",
+    type: "Expense",
+  },
+];
 
 const RecentTransactions = () => {
-  const [transactions, setTransactions] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchTransactions();
-  }, []);
-
-  const fetchTransactions = async () => {
-    try {
-      const response = await getExpenses();
-      setTransactions(response.data);
-    } catch (error) {
-      console.error("Error fetching expenses:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this expense?"
-    );
-
-    if (!confirmDelete) return;
-
-    try {
-      await deleteExpense(id);
-
-      setTransactions((prev) =>
-        prev.filter((item) => item._id !== id)
-      );
-    } catch (error) {
-      console.error("Delete Error:", error);
-      alert("Failed to delete expense.");
-    }
-  };
-
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6">
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-[#0F172A] rounded-3xl p-6 mt-8"
+    >
+      <h2 className="text-2xl font-bold text-white mb-6">
+        Recent Transactions
+      </h2>
 
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">
-          💳 Recent Transactions
-        </h2>
+      <table className="w-full text-white">
+        <thead>
+          <tr className="text-gray-400 border-b border-gray-700">
+            <th className="py-3 text-left">Date</th>
+            <th className="text-left">Category</th>
+            <th className="text-left">Type</th>
+            <th className="text-right">Amount</th>
+          </tr>
+        </thead>
 
-        <span className="bg-blue-600 text-white px-4 py-2 rounded-lg">
-          {transactions.length} Transactions
-        </span>
-      </div>
+        <tbody>
+          {transactions.map((item) => (
+            <tr
+              key={item.id}
+              className="border-b border-gray-800 hover:bg-white/5"
+            >
+              <td className="py-4">{item.date}</td>
+              <td>{item.category}</td>
+              <td>{item.type}</td>
 
-      {loading ? (
-        <div className="text-center py-8">
-          <p>Loading transactions...</p>
-        </div>
-      ) : transactions.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          No transactions found.
-        </div>
-      ) : (
-        <div className="overflow-x-auto">
-
-          <table className="w-full">
-
-            <thead>
-
-              <tr className="bg-gray-100">
-
-                <th className="p-3 text-left">Expense</th>
-
-                <th className="p-3 text-left">Category</th>
-
-                <th className="p-3 text-left">Amount</th>
-
-                <th className="p-3 text-left">Date</th>
-
-                <th className="p-3 text-center">
-                  Action
-                </th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {transactions.map((item) => (
-
-                <tr
-                  key={item._id}
-                  className="border-b hover:bg-gray-50"
-                >
-
-                  <td className="p-4 font-semibold">
-                    {item.title || item.name}
-                  </td>
-
-                  <td className="p-4">
-                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
-                      {item.category || "General"}
-                    </span>
-                  </td>
-
-                  <td className="p-4 font-bold text-red-600">
-                    ₹{item.amount}
-                  </td>
-
-                  <td className="p-4">
-                    {item.date
-                      ? new Date(item.date).toLocaleDateString()
-                      : "-"}
-                  </td>
-
-                  <td className="p-4">
-
-                    <div className="flex justify-center gap-4">
-
-                      <button
-                        className="text-blue-600 hover:text-blue-800"
-                      >
-                        <FaEdit />
-                      </button>
-
-                      <button
-                        onClick={() =>
-                          handleDelete(item._id)
-                        }
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <FaTrash />
-                      </button>
-
-                    </div>
-
-                  </td>
-
-                </tr>
-
-              ))}
-
-            </tbody>
-
-          </table>
-
-        </div>
-      )}
-
-    </div>
+              <td
+                className={`text-right font-semibold ${
+                  item.type === "Income"
+                    ? "text-green-400"
+                    : "text-red-400"
+                }`}
+              >
+                {item.amount}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </motion.div>
   );
 };
 

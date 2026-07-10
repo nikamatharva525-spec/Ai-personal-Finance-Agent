@@ -3,24 +3,29 @@ import Background from "../components/Login/Background";
 import GlassCard from "../components/Login/GlassCard";
 import Illustration from "../components/Login/Illustration";
 import LoginForm from "../components/Login/LoginForm";
+import FloatingIcons from "../components/Login/FloatingIcons";
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../api/authApi";
 
 const Login = () => {
   return (
     <Background>
 
-      <div className="flex justify-center items-center min-h-screen">
+  <FloatingIcons />
 
-        <GlassCard>
+  <div className="flex justify-center items-center min-h-screen">
 
-          <Illustration />
+    <GlassCard>
 
-          <LoginForm />
+      <Illustration />
 
-        </GlassCard>
+      <LoginForm />
 
-      </div>
+    </GlassCard>
 
-    </Background>
+  </div>
+
+</Background>
   );
 };
 

@@ -4,14 +4,10 @@ const API = axios.create({
   baseURL: "http://localhost:5000/api/auth",
 });
 
-// Register User
-export const registerUser = (userData) => {
-  return API.post("/register", userData);
-};
+export const registerUser = (data) =>
+  API.post("/register", data);
 
-// Login User
-export const loginUser = (userData) => {
-  return API.post("/login", userData);
-};
+export const loginUser = (data) =>
+  API.post("/login", data);
 
 export default API;

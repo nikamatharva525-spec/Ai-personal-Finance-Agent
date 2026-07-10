@@ -2,7 +2,9 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+// ============================
 // Register User
+// ============================
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -26,26 +28,36 @@ export const registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
+    console.log("✅ Registered User:", user);
+
     res.status(201).json({
       message: "User registered successfully",
       user,
     });
 
   } catch (error) {
+    console.error("Register Error:", error);
+
     res.status(500).json({
       message: error.message,
     });
   }
 };
 
+// ============================
 // Login User
+// ============================
 export const loginUser = async (req, res) => {
   try {
-
     const { email, password } = req.body;
+
+    console.log("==================================");
+    console.log("Login email:", email);
 
     // Find user
     const user = await User.findOne({ email });
+
+    console.log("User found:", user);
 
     if (!user) {
       return res.status(404).json({
@@ -58,6 +70,8 @@ export const loginUser = async (req, res) => {
       password,
       user.password
     );
+
+    console.log("Password Match:", isMatch);
 
     if (!isMatch) {
       return res.status(400).json({
@@ -74,6 +88,9 @@ export const loginUser = async (req, res) => {
       }
     );
 
+    console.log("✅ Login Successful");
+    console.log("==================================");
+
     res.status(200).json({
       message: "Login successful",
       token,
@@ -81,6 +98,8 @@ export const loginUser = async (req, res) => {
     });
 
   } catch (error) {
+    console.error("Login Error:", error);
+
     res.status(500).json({
       message: error.message,
     });

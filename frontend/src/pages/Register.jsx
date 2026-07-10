@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../api/authApi";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -10,6 +11,9 @@ const Register = () => {
     password: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -17,12 +21,26 @@ const Register = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    alert("Registration Successful!");
+    try {
+      setLoading(true);
+      setError("");
 
-    navigate("/login");
+      const res = await registerUser(formData);
+
+      alert(res.data.message);
+
+      navigate("/login");
+
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Registration Failed"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -66,11 +84,16 @@ const Register = () => {
             className="w-full border p-3 rounded-lg"
           />
 
+          {error && (
+            <p className="text-red-500 text-sm">{error}</p>
+          )}
+
           <button
             type="submit"
+            disabled={loading}
             className="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg"
           >
-            Register
+            {loading ? "Registering..." : "Register"}
           </button>
 
         </form>
