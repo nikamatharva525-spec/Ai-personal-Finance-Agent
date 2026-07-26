@@ -36,7 +36,8 @@ const icons = [
 
 const FloatingIcons = () => {
   return (
-    <>
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+
       {icons.map((item, index) => (
         <motion.div
           key={index}
@@ -53,12 +54,14 @@ const FloatingIcons = () => {
           transition={{
             duration: 3 + index,
             repeat: Infinity,
+            ease: "easeInOut",
           }}
         >
           <item.Icon size={40} />
         </motion.div>
       ))}
-    </>
+
+    </div>
   );
 };
 

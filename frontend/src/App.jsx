@@ -1,25 +1,69 @@
 import { Routes, Route } from "react-router-dom";
-import{BrowserRouter as Router} from "react-router-dom";    
+
+// Pages
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Transactions from "./pages/Transactions";
 import Settings from "./pages/Settings";
-import Analytics from "./components/Analytics/Analytics";
-import BudgetPlanner from "./components/BudgetPlanner";
-import AIAdvisor from "./components/AIAdvisor/AIAdvisor";
+import Profile from "./pages/Profile";
+import Help from "./pages/Help";
+import EditProfile from "./pages/EditProfile";
+import Income from "./pages/Income";
+import Expenses from "./pages/Expenses";
 
+
+// Components
+import Analytics from "./components/Analytics/Analytics";
+import BudgetPlanner from "./components/BudgetPlanner/BudgetPlanner";
+import AIAdvisor from "./components/AIAdvisor/AIAdvisor";
 
 function App() {
   return (
-  <Routes>
-  <Route path="/" element={<Dashboard />} />
-  <Route path="/transactions" element={<Transactions />} />
-  <Route path="/analytics" element={<Analytics />} />
-  <Route path="/budget" element={<BudgetPlanner />} />
-  <Route path="/advisor" element={<AIAdvisor />} />
-  <Route path="/settings" element={<Settings />} />
-</Routes>
+    <Routes>
+      {/* Authentication */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Dashboard */}
+      <Route path="/" element={<Dashboard />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+
+      {/* Finance Pages */}
+      <Route path="/income" element={<Income />} />
+      <Route path="/expenses" element={<Expenses />} />
+      <Route path="/transactions" element={<Transactions />} />
+
+      {/* Other Pages */}
+      <Route path="/analytics" element={<Analytics />} />
+      <Route path="/budget" element={<BudgetPlanner />} />
+      <Route path="/advisor" element={<AIAdvisor />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/edit-profile" element={<EditProfile />} />
+      <Route path="/settings" element={<Settings />} />
+      <Route path="/help" element={<Help />} />
+
+      {/* 404 Page */}
+      <Route
+        path="*"
+        element={
+          <div className="flex flex-col items-center justify-center h-screen bg-slate-900 text-white">
+            <h1 className="text-6xl font-bold">404</h1>
+
+            <p className="mt-4 text-gray-400">
+              Page Not Found
+            </p>
+
+            <button
+              onClick={() => (window.location.href = "/dashboard")}
+              className="mt-6 px-6 py-3 bg-purple-600 rounded-lg hover:bg-purple-700"
+            >
+              Go to Dashboard
+            </button>
+          </div>
+        }
+      />
+    </Routes>
   );
 }
 

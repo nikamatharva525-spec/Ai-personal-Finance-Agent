@@ -1,10 +1,22 @@
 import React from "react";
+import AISettings from "../components/Settings/AISettings";
+import CurrencySettings from "../components/Settings/CurrencySettings";
+import NotificationSettings from "../components/Settings/NotificationSettings";
+import ProfileSettings from "../components/Settings/ProfileSettings";
+import SecuritySettings from "../components/Settings/SecuritySettings";
+import ThemeSettings from "../components/Settings/ThemeSettings";
 
 const Settings = () => {
   return (
-    <div className="ml-72 p-8 text-white min-h-screen bg-[#0F172A]">
-      <h1 className="text-4xl font-bold">⚙️ Settings</h1>
-      <p>Settings page is working.</p>
+    <div className="p-6 bg-slate-900 min-h-screen text-white">
+      <h1 className="text-3xl font-bold mb-6">Settings</h1>
+
+      <ProfileSettings />
+      <ThemeSettings />
+      <NotificationSettings />
+      <CurrencySettings />
+      <SecuritySettings />
+      <AISettings />
     </div>
   );
 };

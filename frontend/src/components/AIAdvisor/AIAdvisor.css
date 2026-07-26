@@ -1,0 +1,30 @@
+.ai-advisor{
+    background:#0F172A;
+    border-radius:24px;
+    padding:24px;
+    box-shadow:0 15px 35px rgba(0,0,0,.3);
+}
+
+.ai-advice-box{
+    background:#1E293B;
+    padding:20px;
+    border-radius:18px;
+    border-left:5px solid #8B5CF6;
+}
+
+.ai-btn{
+    width:100%;
+    padding:15px;
+    border:none;
+    border-radius:14px;
+    background:linear-gradient(90deg,#7C3AED,#3B82F6);
+    color:white;
+    font-size:17px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.ai-btn:hover{
+    transform:scale(1.02);
+}

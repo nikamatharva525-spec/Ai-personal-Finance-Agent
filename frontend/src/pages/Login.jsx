@@ -4,27 +4,27 @@ import GlassCard from "../components/Login/GlassCard";
 import Illustration from "../components/Login/Illustration";
 import LoginForm from "../components/Login/LoginForm";
 import FloatingIcons from "../components/Login/FloatingIcons";
-import { useNavigate } from "react-router-dom";
-import { loginUser } from "../api/authApi";
+import Particles from "../components/Login/Particles";
 
 const Login = () => {
   return (
     <Background>
-
+  <Particles />
   <FloatingIcons />
 
-  <div className="flex justify-center items-center min-h-screen">
-
+  <div className="relative z-10 min-h-screen flex items-center justify-center px-6">
     <GlassCard>
 
-      <Illustration />
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center p-10">
+        <Illustration />
+      </div>
 
-      <LoginForm />
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-10">
+        <LoginForm />
+      </div>
 
     </GlassCard>
-
   </div>
-
 </Background>
   );
 };

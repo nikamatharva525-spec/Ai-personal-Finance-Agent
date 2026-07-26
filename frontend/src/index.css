@@ -1,11 +1,25 @@
 @import "tailwindcss";
 
+/* Enable class-based dark mode in Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
 body {
   margin: 0;
   padding: 0;
   font-family: "Poppins", sans-serif;
-  background: #050816;
   overflow-x: hidden;
+
+  /* Default Light Theme */
+  background: white;
+  color: black;
+
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Theme */
+.dark body {
+  background: #050816;
+  color: white;
 }
 
 * {

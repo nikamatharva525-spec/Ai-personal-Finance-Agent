@@ -1,10 +1,13 @@
 import React, { useState } from "react";
+import { addIncome } from "../../api/incomeApi";
+import { addExpense } from "../../api/expenseApi";
 
-const AddTransaction = () => {
+const AddTransaction = ({ onTransactionAdded }) => {
   const [transaction, setTransaction] = useState({
     title: "",
     amount: "",
     category: "",
+    type: "",
     date: "",
     paymentMethod: "",
     notes: "",
@@ -17,21 +20,52 @@ const AddTransaction = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log(transaction);
+    try {
+      if (transaction.type === "Income") {
+        await addIncome({
+          title: transaction.title,
+          amount: Number(transaction.amount),
+          category: transaction.category,
+          date: transaction.date,
+          paymentMethod: transaction.paymentMethod,
+          notes: transaction.notes,
+        });
+      } else {
+        await addExpense({
+          name: transaction.title,
+          amount: Number(transaction.amount),
+          category: transaction.category,
+          date: transaction.date,
+          paymentMethod: transaction.paymentMethod,
+          notes: transaction.notes,
+        });
+      }
 
-    alert("Transaction Added Successfully!");
+      alert("Transaction Added Successfully!");
 
-    setTransaction({
-      title: "",
-      amount: "",
-      category: "",
-      date: "",
-      paymentMethod: "",
-      notes: "",
-    });
+      // Refresh Transaction Table
+      if (onTransactionAdded) {
+        onTransactionAdded();
+      }
+
+      // Reset Form
+      setTransaction({
+        title: "",
+        amount: "",
+        category: "",
+        type: "",
+        date: "",
+        paymentMethod: "",
+        notes: "",
+      });
+
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Failed to add transaction.");
+    }
   };
 
   return (
@@ -42,28 +76,44 @@ const AddTransaction = () => {
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-2 gap-4"
+        className="grid grid-cols-1 md:grid-cols-2 gap-4"
       >
+        {/* Title */}
         <input
           type="text"
           name="title"
           placeholder="Transaction Title"
           value={transaction.title}
           onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white"
+          className="p-3 rounded-lg bg-slate-700 text-white outline-none focus:ring-2 focus:ring-violet-500"
           required
         />
 
+        {/* Amount */}
         <input
           type="number"
           name="amount"
           placeholder="Amount"
           value={transaction.amount}
           onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white"
+          className="p-3 rounded-lg bg-slate-700 text-white outline-none focus:ring-2 focus:ring-violet-500"
           required
         />
 
+        {/* Transaction Type */}
+        <select
+          name="type"
+          value={transaction.type}
+          onChange={handleChange}
+          className="p-3 rounded-lg bg-slate-700 text-white"
+          required
+        >
+          <option value="">Select Transaction Type</option>
+          <option value="Income">Income</option>
+          <option value="Expense">Expense</option>
+        </select>
+
+        {/* Category */}
         <select
           name="category"
           value={transaction.category}
@@ -72,15 +122,30 @@ const AddTransaction = () => {
           required
         >
           <option value="">Select Category</option>
-          <option>Food</option>
-          <option>Travel</option>
-          <option>Shopping</option>
-          <option>Bills</option>
-          <option>Salary</option>
-          <option>Medical</option>
-          <option>Entertainment</option>
+
+          {transaction.type === "Income" ? (
+            <>
+              <option value="Salary">Salary</option>
+              <option value="Freelancing">Freelancing</option>
+              <option value="Business">Business</option>
+              <option value="Investment">Investment</option>
+              <option value="Other Income">Other Income</option>
+            </>
+          ) : (
+            <>
+              <option value="Food">Food</option>
+              <option value="Travel">Travel</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Medical">Medical</option>
+              <option value="Entertainment">Entertainment</option>
+              <option value="Education">Education</option>
+              <option value="Other">Other</option>
+            </>
+          )}
         </select>
 
+        {/* Date */}
         <input
           type="date"
           name="date"
@@ -90,6 +155,7 @@ const AddTransaction = () => {
           required
         />
 
+        {/* Payment Method */}
         <select
           name="paymentMethod"
           value={transaction.paymentMethod}
@@ -98,25 +164,27 @@ const AddTransaction = () => {
           required
         >
           <option value="">Payment Method</option>
-          <option>Cash</option>
-          <option>UPI</option>
-          <option>Credit Card</option>
-          <option>Debit Card</option>
-          <option>Net Banking</option>
+          <option value="Cash">Cash</option>
+          <option value="UPI">UPI</option>
+          <option value="Credit Card">Credit Card</option>
+          <option value="Debit Card">Debit Card</option>
+          <option value="Net Banking">Net Banking</option>
         </select>
 
+        {/* Notes */}
         <textarea
           name="notes"
           placeholder="Notes"
           value={transaction.notes}
           onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white"
           rows="3"
+          className="md:col-span-2 p-3 rounded-lg bg-slate-700 text-white"
         />
 
+        {/* Submit Button */}
         <button
           type="submit"
-          className="col-span-2 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold transition"
+          className="md:col-span-2 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-blue-600 hover:opacity-90 text-white py-3 rounded-xl font-semibold transition"
         >
           Add Transaction
         </button>

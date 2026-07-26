@@ -1,43 +1,37 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const transactions = [
-  {
-    id: 1,
-    date: "02 Jul",
-    category: "Food",
-    amount: "₹450",
-    type: "Expense",
-  },
-  {
-    id: 2,
-    date: "01 Jul",
-    category: "Fuel",
-    amount: "₹900",
-    type: "Expense",
-  },
-  {
-    id: 3,
-    date: "30 Jun",
-    category: "Salary",
-    amount: "₹40,000",
-    type: "Income",
-  },
-  {
-    id: 4,
-    date: "28 Jun",
-    category: "Shopping",
-    amount: "₹2,100",
-    type: "Expense",
-  },
-];
+const RecentTransactions = ({
+  expenses = [],
+  incomes = [],
+}) => {
 
-const RecentTransactions = () => {
+  // Merge Income + Expense
+  const transactions = [
+    ...expenses.map((item) => ({
+      ...item,
+      type: "Expense",
+    })),
+
+    ...incomes.map((item) => ({
+      ...item,
+      type: "Income",
+    })),
+  ];
+
+  // Sort latest first
+  transactions.sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
+
+  // Show only latest 6
+  const recentTransactions = transactions.slice(0, 6);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-[#0F172A] rounded-3xl p-6 mt-8"
+      className="bg-[#0F172A] rounded-3xl p-6"
     >
       <h2 className="text-2xl font-bold text-white mb-6">
         Recent Transactions
@@ -45,7 +39,7 @@ const RecentTransactions = () => {
 
       <table className="w-full text-white">
         <thead>
-          <tr className="text-gray-400 border-b border-gray-700">
+          <tr className="border-b border-gray-700 text-gray-400">
             <th className="py-3 text-left">Date</th>
             <th className="text-left">Category</th>
             <th className="text-left">Type</th>
@@ -54,26 +48,54 @@ const RecentTransactions = () => {
         </thead>
 
         <tbody>
-          {transactions.map((item) => (
-            <tr
-              key={item.id}
-              className="border-b border-gray-800 hover:bg-white/5"
-            >
-              <td className="py-4">{item.date}</td>
-              <td>{item.category}</td>
-              <td>{item.type}</td>
-
-              <td
-                className={`text-right font-semibold ${
-                  item.type === "Income"
-                    ? "text-green-400"
-                    : "text-red-400"
-                }`}
+          {recentTransactions.length > 0 ? (
+            recentTransactions.map((item) => (
+              <tr
+                key={item._id}
+                className="border-b border-gray-800 hover:bg-white/5"
               >
-                {item.amount}
+                <td className="py-4">
+                  {item.date
+                    ? new Date(item.date).toLocaleDateString("en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                      })
+                    : "-"}
+                </td>
+
+                <td>{item.category || "Income"}</td>
+
+                <td
+                  className={
+                    item.type === "Income"
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }
+                >
+                  {item.type}
+                </td>
+
+                <td
+                  className={`text-right font-semibold ${
+                    item.type === "Income"
+                      ? "text-green-400"
+                      : "text-red-400"
+                  }`}
+                >
+                  ₹{Number(item.amount).toLocaleString()}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan="4"
+                className="text-center py-8 text-gray-400"
+              >
+                No Transactions Found
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </motion.div>

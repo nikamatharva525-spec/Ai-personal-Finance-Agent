@@ -10,4 +10,4 @@ function Counter() {
         </div>
     );
 }
-export default counter;    
+export default ExpenseTracker;

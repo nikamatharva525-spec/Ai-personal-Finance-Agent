@@ -1,69 +1,303 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FaBell,
   FaSearch,
   FaUserCircle,
+  FaCog,
+  FaSignOutAlt,
+  FaUser,
+  FaQuestionCircle,
 } from "react-icons/fa";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const notifications = [
+    "💰 Budget exceeded by ₹2,000",
+    "🤖 AI generated new AI advice",
+    "📊 Monthly financial report is ready",
+    "🎯 Savings goal achieved 80%",
+  ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/login");
+  };
+
   return (
     <motion.div
-      initial={{ y: -40, opacity: 0 }}
+      initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className="h-20 px-8 bg-[#0F172A] border-b border-white/10 flex items-center justify-between"
+      transition={{ duration: 0.5 }}
+      className="sticky top-0 z-50 flex h-20 items-center justify-between border-b border-white/10 bg-slate-900/70 px-8 backdrop-blur-xl shadow-xl"
     >
-      {/* Left */}
+      {/* Left Side */}
       <div>
-        <h2 className="text-3xl font-bold text-white">
+        <h1 className="text-3xl font-bold text-white">
           Dashboard
-        </h2>
+        </h1>
 
-        <p className="text-gray-400 text-sm">
+        <p className="text-slate-400">
           Welcome back 👋
         </p>
       </div>
 
-      {/* Right */}
+      {/* Right Side */}
       <div className="flex items-center gap-6">
 
         {/* Search */}
         <div className="relative">
-          <FaSearch className="absolute left-4 top-4 text-gray-400" />
+
+          <motion.div
+            animate={{
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              repeat: Infinity,
+              duration: 2,
+            }}
+            className="absolute left-4 top-4 text-slate-400"
+          >
+            <FaSearch />
+          </motion.div>
 
           <input
             type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
-            className="pl-12 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-72 rounded-xl border border-white/10 bg-slate-800/80 py-3 pl-11 pr-4 text-white placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/40"
           />
+
         </div>
 
-        {/* Notification */}
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          className="relative cursor-pointer"
-        >
-          <FaBell
-            size={22}
-            className="text-white"
-          />
+        {/* Notifications */}
+        <div className="relative">
 
-          <span className="absolute -top-2 -right-2 w-3 h-3 bg-red-500 rounded-full"></span>
-        </motion.div>
+          <motion.div
+            whileHover={{
+              scale: 1.1,
+              rotate: 10,
+            }}
+            whileTap={{
+              scale: 0.9,
+            }}
+            className="relative cursor-pointer"
+            onClick={() => {
+              setShowNotifications(!showNotifications);
+              setShowProfile(false);
+            }}
+          >
+            <FaBell
+              size={24}
+              className="text-white"
+            />
 
-        {/* User */}
-        <motion.div
-          whileHover={{ scale: 1.1 }}
-          className="cursor-pointer"
-        >
-          <FaUserCircle
-            size={38}
-            className="text-purple-400"
-          />
-        </motion.div>
+            <motion.span
+              animate={{
+                scale: [1, 1.2, 1],
+              }}
+              transition={{
+                repeat: Infinity,
+                duration: 1.5,
+              }}
+              className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+            >
+              {notifications.length}
+            </motion.span>
+
+          </motion.div>
+
+          <AnimatePresence>
+
+            {showNotifications && (
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: -10,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -10,
+                }}
+                transition={{
+                  duration: 0.25,
+                }}
+                className="absolute right-0 mt-5 w-80 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-2xl"
+              >
+
+                <div className="border-b border-white/10 p-4">
+                  <h2 className="font-bold text-white">
+                    🔔 Notifications
+                  </h2>
+                </div>
+
+                {notifications.map((item, index) => (
+
+                  <div
+                    key={index}
+                    className="border-b border-white/10 px-4 py-4 text-slate-300 transition hover:bg-white/10"
+                  >
+                    {item}
+                  </div>
+
+                ))}
+
+                <button
+                  onClick={() =>
+                    setShowNotifications(false)
+                  }
+                  className="w-full bg-gradient-to-r from-violet-600 to-blue-600 py-3 font-semibold text-white transition hover:opacity-90"
+                >
+                  Mark All as Read
+                </button>
+
+              </motion.div>
+
+            )}
+
+          </AnimatePresence>
+
+        </div>
+                {/* Profile */}
+        <div className="relative">
+
+          <motion.div
+            whileHover={{
+              scale: 1.1,
+              rotate: 5,
+            }}
+            whileTap={{
+              scale: 0.9,
+            }}
+            className="cursor-pointer"
+            onClick={() => {
+              setShowProfile(!showProfile);
+              setShowNotifications(false);
+            }}
+          >
+            <FaUserCircle
+              size={38}
+              className="text-violet-400"
+            />
+          </motion.div>
+
+          <AnimatePresence>
+
+            {showProfile && (
+
+              <motion.div
+                initial={{
+                  opacity: 0,
+                  y: -15,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: -15,
+                }}
+                transition={{
+                  duration: 0.25,
+                }}
+                className="absolute right-0 mt-5 w-72 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-2xl"
+              >
+
+                {/* Profile Header */}
+                <div className="border-b border-white/10 p-5">
+
+                  <div className="flex items-center gap-3">
+
+                    <FaUserCircle
+                      size={50}
+                      className="text-violet-400"
+                    />
+
+                    <div>
+                      <h3 className="text-lg font-bold text-white">
+                        Atharva Nikam
+                      </h3>
+
+                      <p className="text-sm text-slate-400">
+                        AI / ML Developer
+                      </p>
+                    </div>
+
+                  </div>
+
+                </div>
+
+                {/* Menu */}
+
+                <button
+                  onClick={() => {
+                    navigate("/profile");
+                    setShowProfile(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-5 py-4 text-white transition hover:bg-white/10"
+                >
+                  <FaUser />
+                  My Profile
+                </button>
+
+                <button
+                  onClick={() => {
+                    navigate("/settings");
+                    setShowProfile(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-5 py-4 text-white transition hover:bg-white/10"
+                >
+                  <FaCog />
+                  Settings
+                </button>
+
+                <button
+                  onClick={() => {
+                    navigate("/help");
+                    setShowProfile(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-5 py-4 text-white transition hover:bg-white/10"
+                >
+                  <FaQuestionCircle />
+                  Help Center
+                </button>
+
+                <div className="border-t border-white/10">
+
+                  <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-3 bg-red-600 px-5 py-4 text-white transition hover:bg-red-700"
+                  >
+                    <FaSignOutAlt />
+                    Logout
+                  </button>
+
+                </div>
+
+              </motion.div>
+
+            )}
+
+          </AnimatePresence>
+
+        </div>
 
       </div>
+
     </motion.div>
   );
 };
