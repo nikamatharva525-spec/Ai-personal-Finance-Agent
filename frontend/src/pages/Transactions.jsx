@@ -12,97 +12,224 @@ import { getExpenses } from "../api/expenseApi";
 const Transactions = () => {
   const [transactions, setTransactions] = useState([]);
 
-  // For Edit Transaction
-  const [editingTransaction, setEditingTransaction] = useState(null);
+  // =========================
+  // EDIT TRANSACTION
+  // =========================
+
+  const [editingTransaction, setEditingTransaction] =
+    useState(null);
+
+  // =========================
+  // FETCH TRANSACTIONS
+  // =========================
 
   const fetchTransactions = async () => {
     try {
-      const incomeRes = await getIncome();
-      const expenseRes = await getExpenses();
+      const [incomeRes, expenseRes] =
+        await Promise.all([
+          getIncome(),
+          getExpenses(),
+        ]);
 
       const incomes = Array.isArray(incomeRes.data)
         ? incomeRes.data
-        : incomeRes.data.incomes || [];
+        : incomeRes.data?.incomes || [];
 
       const expenses = Array.isArray(expenseRes.data)
         ? expenseRes.data
-        : expenseRes.data.expenses || [];
+        : expenseRes.data?.expenses || [];
 
-      // Income Data
+      // =========================
+      // INCOME DATA
+      // =========================
+
       const incomeData = incomes.map((item) => ({
         _id: item._id,
         date: item.date,
-        title: item.title,
-        category: "Income",
-        amount: item.amount,
+        title: item.title || item.source || "Income",
+        category: item.category || "Income",
+        amount: Number(item.amount || 0),
         payment: item.paymentMethod || "-",
         notes: item.notes || "",
         type: "Income",
       }));
 
-      // Expense Data
+      // =========================
+      // EXPENSE DATA
+      // =========================
+
       const expenseData = expenses.map((item) => ({
         _id: item._id,
         date: item.date,
-        title: item.name,
-        category: item.category,
-        amount: item.amount,
+        title: item.name || "Expense",
+        category: item.category || "Other",
+        amount: Number(item.amount || 0),
         payment: item.paymentMethod || "-",
         notes: item.notes || "",
         type: "Expense",
       }));
 
-      const allTransactions = [...incomeData, ...expenseData].sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
+      // =========================
+      // COMBINE + SORT
+      // =========================
+
+      const allTransactions = [
+        ...incomeData,
+        ...expenseData,
+      ].sort(
+        (a, b) =>
+          new Date(b.date) - new Date(a.date)
       );
 
       setTransactions(allTransactions);
-
     } catch (error) {
-      console.error("Error fetching transactions:", error);
+      console.error(
+        "Error fetching transactions:",
+        error
+      );
+
+      setTransactions([]);
     }
   };
+
+  // =========================
+  // INITIAL FETCH
+  // =========================
 
   useEffect(() => {
     fetchTransactions();
   }, []);
 
-  return (
-    <div className="flex min-h-screen bg-slate-900">
+  // =========================
+  // MAIN UI
+  // =========================
 
-      {/* Sidebar */}
+  return (
+    <div
+      className="
+        flex
+        min-h-screen
+        min-w-0
+        bg-slate-900
+      "
+    >
+      {/* ========================= */}
+      {/* SIDEBAR */}
+      {/* ========================= */}
+
       <Sidebar />
 
-      {/* Main Content */}
-      <div className="flex-1 ml-64">
+      {/* ========================= */}
+      {/* MAIN CONTENT */}
+      {/* ========================= */}
 
-        {/* Navbar */}
+      <div
+        className="
+          flex-1
+          min-w-0
+          ml-0
+          md:ml-64
+          pt-16
+          md:pt-0
+        "
+      >
+        {/* ========================= */}
+        {/* NAVBAR */}
+        {/* ========================= */}
+
         <Navbar />
 
-        <div className="p-6 space-y-6">
+        {/* ========================= */}
+        {/* PAGE CONTENT */}
+        {/* ========================= */}
 
-          <h1 className="text-3xl font-bold text-white">
-            Transactions
-          </h1>
+        <div
+          className="
+            w-full
+            min-w-0
+            space-y-5
+            sm:space-y-6
+            p-4
+            sm:p-6
+            md:p-8
+          "
+        >
+          {/* ========================= */}
+          {/* PAGE TITLE */}
+          {/* ========================= */}
 
-          {/* Add / Update Transaction */}
-          <AddTransaction
-            editingTransaction={editingTransaction}
-            setEditingTransaction={setEditingTransaction}
-            onTransactionAdded={fetchTransactions}
-          />
+          <div>
+            <h1
+              className="
+                text-3xl
+                sm:text-4xl
+                font-bold
+                text-white
+              "
+            >
+              Transactions
+            </h1>
 
-          {/* Transaction Table */}
-          <TransactionTable
-            transactions={transactions}
-            refreshTransactions={fetchTransactions}
-            onEdit={setEditingTransaction}
-          />
+            <p
+              className="
+                mt-2
+                text-sm
+                sm:text-base
+                text-slate-400
+              "
+            >
+              Manage your income and expenses in one
+              place.
+            </p>
+          </div>
 
+          {/* ========================= */}
+          {/* ADD / UPDATE TRANSACTION */}
+          {/* ========================= */}
+
+          <div className="w-full min-w-0">
+            <AddTransaction
+              editingTransaction={
+                editingTransaction
+              }
+              setEditingTransaction={
+                setEditingTransaction
+              }
+              onTransactionAdded={
+                fetchTransactions
+              }
+            />
+          </div>
+
+          {/* ========================= */}
+          {/* TRANSACTION TABLE */}
+          {/* ========================= */}
+
+          <div
+            className="
+              w-full
+              min-w-0
+              overflow-hidden
+              rounded-2xl
+              sm:rounded-3xl
+              border
+              border-white/10
+              bg-white/5
+              shadow-xl
+            "
+          >
+            <div className="w-full min-w-0 overflow-x-auto">
+              <TransactionTable
+                transactions={transactions}
+                refreshTransactions={
+                  fetchTransactions
+                }
+                onEdit={setEditingTransaction}
+              />
+            </div>
+          </div>
         </div>
-
       </div>
-
     </div>
   );
 };

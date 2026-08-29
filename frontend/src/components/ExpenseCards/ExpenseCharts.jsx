@@ -22,15 +22,18 @@ const COLORS = [
 ];
 
 const ExpenseCharts = ({ expenses = [] }) => {
+  // =========================
+  // EXPENSE BY CATEGORY
+  // =========================
 
-  // Expense by Category
   const categoryMap = {};
 
   expenses.forEach((expense) => {
     const category = expense.category || "Others";
+    const amount = Number(expense.amount || 0);
 
     categoryMap[category] =
-      (categoryMap[category] || 0) + Number(expense.amount);
+      (categoryMap[category] || 0) + amount;
   });
 
   const categoryData = Object.keys(categoryMap).map((key) => ({
@@ -38,16 +41,26 @@ const ExpenseCharts = ({ expenses = [] }) => {
     value: categoryMap[key],
   }));
 
-  // Monthly Expense
+  // =========================
+  // MONTHLY EXPENSE
+  // =========================
+
   const monthMap = {};
 
   expenses.forEach((expense) => {
-    const month = new Date(expense.date).toLocaleString("default", {
-      month: "short",
-    });
+    if (!expense.date) return;
+
+    const month = new Date(expense.date).toLocaleString(
+      "default",
+      {
+        month: "short",
+      }
+    );
+
+    const amount = Number(expense.amount || 0);
 
     monthMap[month] =
-      (monthMap[month] || 0) + Number(expense.amount);
+      (monthMap[month] || 0) + amount;
   });
 
   const monthlyData = Object.keys(monthMap).map((month) => ({
@@ -56,73 +69,153 @@ const ExpenseCharts = ({ expenses = [] }) => {
   }));
 
   return (
-    <div className="grid md:grid-cols-2 gap-6 mt-8">
+    <div
+      className="
+        grid
+        grid-cols-1
+        md:grid-cols-2
+        gap-4
+        sm:gap-6
+        mt-6
+        sm:mt-8
+        w-full
+        min-w-0
+      "
+    >
+      {/* ========================= */}
+      {/* PIE CHART */}
+      {/* ========================= */}
 
-      {/* Pie Chart */}
-
-      <div className="bg-white rounded-2xl shadow-md p-5">
-
-        <h2 className="text-xl font-bold mb-4">
+      <div
+        className="
+          w-full
+          min-w-0
+          overflow-hidden
+          rounded-2xl
+          bg-white
+          p-4
+          sm:p-5
+          shadow-md
+        "
+      >
+        <h2 className="mb-4 text-lg sm:text-xl font-bold text-slate-800">
           Expense Categories
         </h2>
 
-        <ResponsiveContainer width="100%" height={300}>
-
-          <PieChart>
-
-            <Pie
-              data={categoryData}
-              dataKey="value"
-              nameKey="name"
-              outerRadius={100}
+        {categoryData.length === 0 ? (
+          <div className="flex h-[260px] sm:h-[300px] items-center justify-center text-slate-500">
+            No expense data available
+          </div>
+        ) : (
+          <div className="w-full min-w-0">
+            <ResponsiveContainer
+              width="100%"
+              height={260}
             >
-              {categoryData.map((entry, index) => (
-                <Cell
-                  key={index}
-                  fill={COLORS[index % COLORS.length]}
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius="65%"
+                  label
+                >
+                  {categoryData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={
+                        COLORS[index % COLORS.length]
+                      }
+                    />
+                  ))}
+                </Pie>
+
+                <Tooltip
+                  formatter={(value) =>
+                    `₹${Number(value).toLocaleString(
+                      "en-IN"
+                    )}`
+                  }
                 />
-              ))}
-            </Pie>
-
-            <Tooltip />
-
-          </PieChart>
-
-        </ResponsiveContainer>
-
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
-      {/* Bar Chart */}
+      {/* ========================= */}
+      {/* BAR CHART */}
+      {/* ========================= */}
 
-      <div className="bg-white rounded-2xl shadow-md p-5">
-
-        <h2 className="text-xl font-bold mb-4">
+      <div
+        className="
+          w-full
+          min-w-0
+          overflow-hidden
+          rounded-2xl
+          bg-white
+          p-4
+          sm:p-5
+          shadow-md
+        "
+      >
+        <h2 className="mb-4 text-lg sm:text-xl font-bold text-slate-800">
           Monthly Expenses
         </h2>
 
-        <ResponsiveContainer width="100%" height={300}>
+        {monthlyData.length === 0 ? (
+          <div className="flex h-[260px] sm:h-[300px] items-center justify-center text-slate-500">
+            No monthly expense data available
+          </div>
+        ) : (
+          <div className="w-full min-w-0">
+            <ResponsiveContainer
+              width="100%"
+              height={260}
+            >
+              <BarChart
+                data={monthlyData}
+                margin={{
+                  top: 10,
+                  right: 10,
+                  left: 0,
+                  bottom: 5,
+                }}
+              >
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                />
 
-          <BarChart data={monthlyData}>
+                <XAxis
+                  dataKey="month"
+                  tick={{ fontSize: 12 }}
+                />
 
-            <CartesianGrid strokeDasharray="3 3" />
+                <YAxis
+                  tick={{ fontSize: 12 }}
+                  width={45}
+                />
 
-            <XAxis dataKey="month" />
+                <Tooltip
+                  formatter={(value) =>
+                    `₹${Number(value).toLocaleString(
+                      "en-IN"
+                    )}`
+                  }
+                />
 
-            <YAxis />
-
-            <Tooltip />
-
-            <Bar
-              dataKey="expense"
-              fill="#ef4444"
-            />
-
-          </BarChart>
-
-        </ResponsiveContainer>
-
+                <Bar
+                  dataKey="expense"
+                  fill="#ef4444"
+                  radius={[6, 6, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
-
     </div>
   );
 };

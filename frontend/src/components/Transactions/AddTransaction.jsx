@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   addIncome,
@@ -15,6 +15,9 @@ const AddTransaction = ({
   editingTransaction,
   setEditingTransaction,
 }) => {
+  // =========================
+  // FORM STATE
+  // =========================
 
   const [transaction, setTransaction] = useState({
     title: "",
@@ -25,6 +28,12 @@ const AddTransaction = ({
     paymentMethod: "",
     notes: "",
   });
+
+  const [loading, setLoading] = useState(false);
+
+  // =========================
+  // LOAD EDITING TRANSACTION
+  // =========================
 
   useEffect(() => {
     if (editingTransaction) {
@@ -38,95 +47,29 @@ const AddTransaction = ({
           : "",
         paymentMethod:
           editingTransaction.payment || "",
-        notes:
-          editingTransaction.notes || "",
+        notes: editingTransaction.notes || "",
       });
     }
   }, [editingTransaction]);
 
+  // =========================
+  // HANDLE INPUT CHANGE
+  // =========================
+
   const handleChange = (e) => {
-    setTransaction({
-      ...transaction,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+
+    setTransaction((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
-  const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  try {
+  // =========================
+  // RESET FORM
+  // =========================
 
-    // ==========================
-    // UPDATE TRANSACTION
-    // ==========================
-    if (editingTransaction) {
-
-      if (transaction.type === "Income") {
-
-        await updateIncome(editingTransaction._id, {
-          title: transaction.title,
-          amount: Number(transaction.amount),
-          category: transaction.category,
-          date: transaction.date,
-          paymentMethod: transaction.paymentMethod,
-          notes: transaction.notes,
-        });
-
-      } else {
-
-        await updateExpense(editingTransaction._id, {
-          name: transaction.title,
-          amount: Number(transaction.amount),
-          category: transaction.category,
-          date: transaction.date,
-          paymentMethod: transaction.paymentMethod,
-          notes: transaction.notes,
-        });
-
-      }
-
-      alert("Transaction Updated Successfully!");
-      setEditingTransaction(null);
-
-    }
-
-    // ==========================
-    // ADD NEW TRANSACTION
-    // ==========================
-    else {
-
-      if (transaction.type === "Income") {
-
-        await addIncome({
-          title: transaction.title,
-          amount: Number(transaction.amount),
-          category: transaction.category,
-          date: transaction.date,
-          paymentMethod: transaction.paymentMethod,
-          notes: transaction.notes,
-        });
-
-      } else {
-
-        await addExpense({
-          name: transaction.title,
-          amount: Number(transaction.amount),
-          category: transaction.category,
-          date: transaction.date,
-          paymentMethod: transaction.paymentMethod,
-          notes: transaction.notes,
-        });
-
-      }
-
-      alert("Transaction Added Successfully!");
-    }
-
-    // Refresh Transaction Table
-    if (onTransactionAdded) {
-      onTransactionAdded();
-    }
-
-    // Reset Form
+  const resetForm = () => {
     setTransaction({
       title: "",
       amount: "",
@@ -136,185 +79,610 @@ const AddTransaction = ({
       paymentMethod: "",
       notes: "",
     });
+  };
 
-   } catch (error) {
+  // =========================
+  // SUBMIT FORM
+  // =========================
 
-  console.error("Full Error:", error);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (error.response) {
+    // Basic validation
+    if (
+      !transaction.title.trim() ||
+      !transaction.amount ||
+      !transaction.type ||
+      !transaction.category ||
+      !transaction.date ||
+      !transaction.paymentMethod
+    ) {
+      alert("Please fill all required fields.");
+      return;
+    }
 
-    console.log("Status:", error.response.status);
-    console.log("Data:", error.response.data);
+    if (Number(transaction.amount) <= 0) {
+      alert("Amount must be greater than 0.");
+      return;
+    }
 
-    alert(
-      `Error ${error.response.status}: ${
-        error.response.data.message || "Unknown error"
-      }`
-    );
+    try {
+      setLoading(true);
 
-  } else {
+      // =========================
+      // UPDATE TRANSACTION
+      // =========================
 
-    alert(error.message);
+      if (editingTransaction) {
+        if (transaction.type === "Income") {
+          await updateIncome(
+            editingTransaction._id,
+            {
+              title: transaction.title.trim(),
+              amount: Number(transaction.amount),
+              category: transaction.category,
+              date: transaction.date,
+              paymentMethod:
+                transaction.paymentMethod,
+              notes: transaction.notes,
+            }
+          );
+        } else {
+          await updateExpense(
+            editingTransaction._id,
+            {
+              name: transaction.title.trim(),
+              amount: Number(transaction.amount),
+              category: transaction.category,
+              date: transaction.date,
+              paymentMethod:
+                transaction.paymentMethod,
+              notes: transaction.notes,
+            }
+          );
+        }
 
-  }
+        alert("Transaction Updated Successfully!");
 
-}
-  return(
-    <div className="bg-slate-800 rounded-2xl p-6 shadow-lg">
+        setEditingTransaction(null);
+      }
 
-      <h2 className="text-2xl font-bold text-white mb-6">
+      // =========================
+      // ADD NEW TRANSACTION
+      // =========================
+
+      else {
+        if (transaction.type === "Income") {
+          await addIncome({
+            title: transaction.title.trim(),
+            amount: Number(transaction.amount),
+            category: transaction.category,
+            date: transaction.date,
+            paymentMethod:
+              transaction.paymentMethod,
+            notes: transaction.notes,
+          });
+        } else {
+          await addExpense({
+            name: transaction.title.trim(),
+            amount: Number(transaction.amount),
+            category: transaction.category,
+            date: transaction.date,
+            paymentMethod:
+              transaction.paymentMethod,
+            notes: transaction.notes,
+          });
+        }
+
+        alert("Transaction Added Successfully!");
+      }
+
+      // =========================
+      // REFRESH TABLE
+      // =========================
+
+      if (onTransactionAdded) {
+        await onTransactionAdded();
+      }
+
+      // =========================
+      // RESET FORM
+      // =========================
+
+      resetForm();
+    } catch (error) {
+      console.error(
+        "Transaction Error:",
+        error
+      );
+
+      if (error.response) {
+        console.log(
+          "Status:",
+          error.response.status
+        );
+
+        console.log(
+          "Data:",
+          error.response.data
+        );
+
+        alert(
+          `Error ${error.response.status}: ${
+            error.response.data?.message ||
+            "Operation failed"
+          }`
+        );
+      } else {
+        alert(
+          error.message ||
+            "Something went wrong."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // =========================
+  // CANCEL EDIT
+  // =========================
+
+  const handleCancel = () => {
+    setEditingTransaction(null);
+    resetForm();
+  };
+
+  // =========================
+  // UI
+  // =========================
+
+  return (
+    <div
+      className="
+        w-full
+        min-w-0
+        overflow-hidden
+        rounded-2xl
+        sm:rounded-3xl
+        bg-slate-800
+        p-4
+        sm:p-6
+        shadow-xl
+      "
+    >
+      {/* ========================= */}
+      {/* HEADER */}
+      {/* ========================= */}
+
+      <h2
+        className="
+          mb-5
+          sm:mb-6
+          text-xl
+          sm:text-2xl
+          font-bold
+          text-white
+        "
+      >
         {editingTransaction
           ? "Update Transaction"
           : "Add New Transaction"}
       </h2>
 
+      {/* ========================= */}
+      {/* FORM */}
+      {/* ========================= */}
+
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-4"
+        className="
+          grid
+          grid-cols-1
+          md:grid-cols-2
+          gap-4
+        "
       >
+        {/* ========================= */}
+        {/* TITLE */}
+        {/* ========================= */}
 
-        {/* Title */}
-        <input
-          type="text"
-          name="title"
-          placeholder="Transaction Title"
-          value={transaction.title}
-          onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white outline-none focus:ring-2 focus:ring-violet-500"
-          required
-        />
+        <div className="min-w-0">
+          <label className="mb-2 block text-sm font-medium text-slate-300">
+            Transaction Title
+          </label>
 
-        {/* Amount */}
-        <input
-          type="number"
-          name="amount"
-          placeholder="Amount"
-          value={transaction.amount}
-          onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white outline-none focus:ring-2 focus:ring-violet-500"
-          required
-        />
+          <input
+            type="text"
+            name="title"
+            placeholder="Transaction Title"
+            value={transaction.title}
+            onChange={handleChange}
+            className="
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-slate-700
+              px-4
+              py-3
+              text-white
+              placeholder:text-slate-400
+              outline-none
+              transition
+              focus:border-violet-500
+              focus:ring-2
+              focus:ring-violet-500/40
+            "
+            required
+          />
+        </div>
 
-        {/* Transaction Type */}
-        <select
-          name="type"
-          value={transaction.type}
-          onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white"
-          required
+        {/* ========================= */}
+        {/* AMOUNT */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+          <label className="mb-2 block text-sm font-medium text-slate-300">
+            Amount
+          </label>
+
+          <input
+            type="number"
+            name="amount"
+            placeholder="Amount"
+            value={transaction.amount}
+            onChange={handleChange}
+            min="1"
+            step="0.01"
+            className="
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-slate-700
+              px-4
+              py-3
+              text-white
+              placeholder:text-slate-400
+              outline-none
+              transition
+              focus:border-violet-500
+              focus:ring-2
+              focus:ring-violet-500/40
+            "
+            required
+          />
+        </div>
+
+        {/* ========================= */}
+        {/* TYPE */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+          <label className="mb-2 block text-sm font-medium text-slate-300">
+            Transaction Type
+          </label>
+
+          <select
+            name="type"
+            value={transaction.type}
+            onChange={handleChange}
+            className="
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-slate-700
+              px-4
+              py-3
+              text-white
+              outline-none
+              focus:border-violet-500
+              focus:ring-2
+              focus:ring-violet-500/40
+            "
+            required
+          >
+            <option value="">
+              Select Transaction Type
+            </option>
+
+            <option value="Income">
+              Income
+            </option>
+
+            <option value="Expense">
+              Expense
+            </option>
+          </select>
+        </div>
+
+        {/* ========================= */}
+        {/* CATEGORY */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+          <label className="mb-2 block text-sm font-medium text-slate-300">
+            Category
+          </label>
+
+          <select
+            name="category"
+            value={transaction.category}
+            onChange={handleChange}
+            className="
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-slate-700
+              px-4
+              py-3
+              text-white
+              outline-none
+              focus:border-violet-500
+              focus:ring-2
+              focus:ring-violet-500/40
+            "
+            required
+          >
+            <option value="">
+              Select Category
+            </option>
+
+            {transaction.type === "Income" ? (
+              <>
+                <option value="Salary">
+                  Salary
+                </option>
+
+                <option value="Freelancing">
+                  Freelancing
+                </option>
+
+                <option value="Business">
+                  Business
+                </option>
+
+                <option value="Investment">
+                  Investment
+                </option>
+
+                <option value="Other Income">
+                  Other Income
+                </option>
+              </>
+            ) : (
+              <>
+                <option value="Food">
+                  Food
+                </option>
+
+                <option value="Travel">
+                  Travel
+                </option>
+
+                <option value="Shopping">
+                  Shopping
+                </option>
+
+                <option value="Bills">
+                  Bills
+                </option>
+
+                <option value="Medical">
+                  Medical
+                </option>
+
+                <option value="Entertainment">
+                  Entertainment
+                </option>
+
+                <option value="Education">
+                  Education
+                </option>
+
+                <option value="Other">
+                  Other
+                </option>
+              </>
+            )}
+          </select>
+        </div>
+
+        {/* ========================= */}
+        {/* DATE */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+          <label className="mb-2 block text-sm font-medium text-slate-300">
+            Date
+          </label>
+
+          <input
+            type="date"
+            name="date"
+            value={transaction.date}
+            onChange={handleChange}
+            className="
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-slate-700
+              px-4
+              py-3
+              text-white
+              outline-none
+              focus:border-violet-500
+              focus:ring-2
+              focus:ring-violet-500/40
+            "
+            required
+          />
+        </div>
+
+        {/* ========================= */}
+        {/* PAYMENT METHOD */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+          <label className="mb-2 block text-sm font-medium text-slate-300">
+            Payment Method
+          </label>
+
+          <select
+            name="paymentMethod"
+            value={transaction.paymentMethod}
+            onChange={handleChange}
+            className="
+              w-full
+              rounded-xl
+              border
+              border-white/10
+              bg-slate-700
+              px-4
+              py-3
+              text-white
+              outline-none
+              focus:border-violet-500
+              focus:ring-2
+              focus:ring-violet-500/40
+            "
+            required
+          >
+            <option value="">
+              Payment Method
+            </option>
+
+            <option value="Cash">
+              Cash
+            </option>
+
+            <option value="UPI">
+              UPI
+            </option>
+
+            <option value="Credit Card">
+              Credit Card
+            </option>
+
+            <option value="Debit Card">
+              Debit Card
+            </option>
+
+            <option value="Net Banking">
+              Net Banking
+            </option>
+          </select>
+        </div>
+
+        {/* ========================= */}
+        {/* NOTES */}
+        {/* ========================= */}
+
+        <div className="md:col-span-2 min-w-0">
+          <label className="mb-2 block text-sm font-medium text-slate-300">
+            Notes
+          </label>
+
+          <textarea
+            name="notes"
+            placeholder="Add notes (optional)"
+            value={transaction.notes}
+            onChange={handleChange}
+            rows="3"
+            className="
+              w-full
+              resize-none
+              rounded-xl
+              border
+              border-white/10
+              bg-slate-700
+              px-4
+              py-3
+              text-white
+              placeholder:text-slate-400
+              outline-none
+              focus:border-violet-500
+              focus:ring-2
+              focus:ring-violet-500/40
+            "
+          />
+        </div>
+
+        {/* ========================= */}
+        {/* BUTTONS */}
+        {/* ========================= */}
+
+        <div
+          className="
+            md:col-span-2
+            mt-2
+            flex
+            flex-col
+            gap-3
+            sm:flex-row
+          "
         >
-          <option value="">Select Transaction Type</option>
-          <option value="Income">Income</option>
-          <option value="Expense">Expense</option>
-        </select>
-
-        {/* Category */}
-        <select
-          name="category"
-          value={transaction.category}
-          onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white"
-          required
-        >
-          <option value="">Select Category</option>
-
-          {transaction.type === "Income" ? (
-            <>
-              <option value="Salary">Salary</option>
-              <option value="Freelancing">Freelancing</option>
-              <option value="Business">Business</option>
-              <option value="Investment">Investment</option>
-              <option value="Other Income">Other Income</option>
-            </>
-          ) : (
-            <>
-              <option value="Food">Food</option>
-              <option value="Travel">Travel</option>
-              <option value="Shopping">Shopping</option>
-              <option value="Bills">Bills</option>
-              <option value="Medical">Medical</option>
-              <option value="Entertainment">Entertainment</option>
-              <option value="Education">Education</option>
-              <option value="Other">Other</option>
-            </>
-          )}
-        </select>
-
-        {/* Date */}
-        <input
-          type="date"
-          name="date"
-          value={transaction.date}
-          onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white"
-          required
-        />
-
-        {/* Payment Method */}
-        <select
-          name="paymentMethod"
-          value={transaction.paymentMethod}
-          onChange={handleChange}
-          className="p-3 rounded-lg bg-slate-700 text-white"
-          required
-        >
-          <option value="">Payment Method</option>
-          <option value="Cash">Cash</option>
-          <option value="UPI">UPI</option>
-          <option value="Credit Card">Credit Card</option>
-          <option value="Debit Card">Debit Card</option>
-          <option value="Net Banking">Net Banking</option>
-        </select>
-                {/* Notes */}
-        <textarea
-          name="notes"
-          placeholder="Notes"
-          value={transaction.notes}
-          onChange={handleChange}
-          rows="3"
-          className="md:col-span-2 p-3 rounded-lg bg-slate-700 text-white outline-none focus:ring-2 focus:ring-violet-500"
-        />
-
-        {/* Buttons */}
-        <div className="md:col-span-2 flex gap-4 mt-4">
+          {/* ADD / UPDATE */}
 
           <button
             type="submit"
-            className="flex-1 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-blue-600 hover:opacity-90 text-white py-3 rounded-xl font-semibold transition"
+            disabled={loading}
+            className="
+              flex-1
+              rounded-xl
+              bg-gradient-to-r
+              from-violet-600
+              via-fuchsia-600
+              to-blue-600
+              px-5
+              py-3
+              font-semibold
+              text-white
+              transition
+              hover:opacity-90
+              active:scale-[0.98]
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
           >
-            {editingTransaction
+            {loading
+              ? "Processing..."
+              : editingTransaction
               ? "Update Transaction"
               : "Add Transaction"}
           </button>
 
+          {/* CANCEL */}
+
           {editingTransaction && (
             <button
               type="button"
-              onClick={() => {
-                setEditingTransaction(null);
-
-                setTransaction({
-                  title: "",
-                  amount: "",
-                  category: "",
-                  type: "",
-                  date: "",
-                  paymentMethod: "",
-                  notes: "",
-                });
-              }}
-              className="px-8 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition"
+              onClick={handleCancel}
+              disabled={loading}
+              className="
+                rounded-xl
+                bg-red-600
+                px-6
+                py-3
+                font-semibold
+                text-white
+                transition
+                hover:bg-red-700
+                active:scale-[0.98]
+                disabled:opacity-50
+              "
             >
               Cancel
             </button>
           )}
-
         </div>
-
       </form>
-
     </div>
   );
 };
-};
+
 export default AddTransaction;

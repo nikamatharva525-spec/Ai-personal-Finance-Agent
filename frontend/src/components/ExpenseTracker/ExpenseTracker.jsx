@@ -15,11 +15,25 @@ const ExpenseTracker = ({ refreshExpenses }) => {
   const [date, setDate] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // =========================
+  // ADD EXPENSE
+  // =========================
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!expenseName || !amount || !category || !date) {
+    if (
+      !expenseName.trim() ||
+      !amount ||
+      !category ||
+      !date
+    ) {
       alert("Please fill all fields");
+      return;
+    }
+
+    if (Number(amount) <= 0) {
+      alert("Amount must be greater than 0");
       return;
     }
 
@@ -27,7 +41,7 @@ const ExpenseTracker = ({ refreshExpenses }) => {
       setLoading(true);
 
       const expenseData = {
-        name: expenseName,
+        name: expenseName.trim(),
         amount: Number(amount),
         category,
         date,
@@ -39,86 +53,295 @@ const ExpenseTracker = ({ refreshExpenses }) => {
 
       alert("Expense Added Successfully!");
 
+      // Reset form
       setExpenseName("");
       setAmount("");
       setCategory("");
       setDate("");
 
+      // Refresh expense list
       if (refreshExpenses) {
-        refreshExpenses();
+        await refreshExpenses();
       }
     } catch (error) {
-      console.error("Add Expense Error:", error.response?.data || error.message);
-      alert(error.response?.data?.message || "Failed to add expense");
+      console.error(
+        "Add Expense Error:",
+        error.response?.data || error.message
+      );
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to add expense"
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-3xl shadow-xl border border-gray-200 p-8">
-      <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-3 mb-8">
-        <FaMoneyBillWave className="text-blue-600" />
-        Add New Expense
+    <div
+      className="
+        w-full
+        min-w-0
+        rounded-2xl
+        sm:rounded-3xl
+        border
+        border-gray-200
+        bg-white
+        p-4
+        sm:p-6
+        md:p-8
+        shadow-xl
+      "
+    >
+      {/* ========================= */}
+      {/* HEADER */}
+      {/* ========================= */}
+
+      <h2
+        className="
+          mb-6
+          sm:mb-8
+          flex
+          items-center
+          gap-3
+          text-2xl
+          sm:text-3xl
+          font-bold
+          text-gray-800
+        "
+      >
+        <FaMoneyBillWave className="flex-shrink-0 text-blue-600" />
+
+        <span>
+          Add New Expense
+        </span>
       </h2>
+
+      {/* ========================= */}
+      {/* FORM */}
+      {/* ========================= */}
 
       <form
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        className="
+          grid
+          grid-cols-1
+          md:grid-cols-2
+          gap-5
+          sm:gap-6
+        "
       >
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
+        {/* ========================= */}
+        {/* EXPENSE NAME */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+
+          <label
+            className="
+              mb-2
+              block
+              text-sm
+              sm:text-base
+              font-semibold
+              text-gray-700
+            "
+          >
             Expense Name
           </label>
 
           <input
             type="text"
             value={expenseName}
-            onChange={(e) => setExpenseName(e.target.value)}
+            onChange={(e) =>
+              setExpenseName(e.target.value)
+            }
             placeholder="Netflix Subscription"
-            className="w-full rounded-2xl border border-gray-300 bg-gray-50 px-5 py-4 text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"
+            className="
+              w-full
+              rounded-xl
+              sm:rounded-2xl
+              border
+              border-gray-300
+              bg-gray-50
+              px-4
+              sm:px-5
+              py-3
+              sm:py-4
+              text-sm
+              sm:text-base
+              text-gray-800
+              outline-none
+              transition
+              focus:border-blue-500
+              focus:ring-2
+              focus:ring-blue-500
+            "
+            required
           />
+
         </div>
 
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2">
+        {/* ========================= */}
+        {/* AMOUNT */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+
+          <label
+            className="
+              mb-2
+              block
+              text-sm
+              sm:text-base
+              font-semibold
+              text-gray-700
+            "
+          >
             Amount (₹)
           </label>
 
           <input
             type="number"
             value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) =>
+              setAmount(e.target.value)
+            }
             placeholder="500"
-            className="w-full rounded-2xl border border-gray-300 bg-gray-50 px-5 py-4 text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"
+            min="1"
+            step="0.01"
+            className="
+              w-full
+              rounded-xl
+              sm:rounded-2xl
+              border
+              border-gray-300
+              bg-gray-50
+              px-4
+              sm:px-5
+              py-3
+              sm:py-4
+              text-sm
+              sm:text-base
+              text-gray-800
+              outline-none
+              transition
+              focus:border-blue-500
+              focus:ring-2
+              focus:ring-blue-500
+            "
+            required
           />
+
         </div>
 
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2 flex items-center gap-2">
+        {/* ========================= */}
+        {/* CATEGORY */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+
+          <label
+            className="
+              mb-2
+              flex
+              items-center
+              gap-2
+              text-sm
+              sm:text-base
+              font-semibold
+              text-gray-700
+            "
+          >
             <FaTag className="text-blue-500" />
             Category
           </label>
 
           <select
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="w-full rounded-2xl border border-gray-300 bg-gray-50 px-5 py-4 text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"
+            onChange={(e) =>
+              setCategory(e.target.value)
+            }
+            className="
+              w-full
+              rounded-xl
+              sm:rounded-2xl
+              border
+              border-gray-300
+              bg-gray-50
+              px-4
+              sm:px-5
+              py-3
+              sm:py-4
+              text-sm
+              sm:text-base
+              text-gray-800
+              outline-none
+              transition
+              focus:border-blue-500
+              focus:ring-2
+              focus:ring-blue-500
+            "
+            required
           >
-            <option value="">Select Category</option>
-            <option value="Food">Food</option>
-            <option value="Travel">Travel</option>
-            <option value="Shopping">Shopping</option>
-            <option value="Bills">Bills</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Education">Education</option>
-            <option value="Healthcare">Healthcare</option>
-            <option value="Others">Others</option>
+            <option value="">
+              Select Category
+            </option>
+
+            <option value="Food">
+              Food
+            </option>
+
+            <option value="Travel">
+              Travel
+            </option>
+
+            <option value="Shopping">
+              Shopping
+            </option>
+
+            <option value="Bills">
+              Bills
+            </option>
+
+            <option value="Entertainment">
+              Entertainment
+            </option>
+
+            <option value="Education">
+              Education
+            </option>
+
+            <option value="Healthcare">
+              Healthcare
+            </option>
+
+            <option value="Others">
+              Others
+            </option>
           </select>
+
         </div>
 
-        <div>
-          <label className="block text-gray-700 font-semibold mb-2 flex items-center gap-2">
+        {/* ========================= */}
+        {/* DATE */}
+        {/* ========================= */}
+
+        <div className="min-w-0">
+
+          <label
+            className="
+              mb-2
+              flex
+              items-center
+              gap-2
+              text-sm
+              sm:text-base
+              font-semibold
+              text-gray-700
+            "
+          >
             <FaCalendarAlt className="text-blue-500" />
             Date
           </label>
@@ -126,20 +349,78 @@ const ExpenseTracker = ({ refreshExpenses }) => {
           <input
             type="date"
             value={date}
-            onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-2xl border border-gray-300 bg-gray-50 px-5 py-4 text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none"
+            onChange={(e) =>
+              setDate(e.target.value)
+            }
+            className="
+              w-full
+              rounded-xl
+              sm:rounded-2xl
+              border
+              border-gray-300
+              bg-gray-50
+              px-4
+              sm:px-5
+              py-3
+              sm:py-4
+              text-sm
+              sm:text-base
+              text-gray-800
+              outline-none
+              transition
+              focus:border-blue-500
+              focus:ring-2
+              focus:ring-blue-500
+            "
+            required
           />
+
         </div>
 
+        {/* ========================= */}
+        {/* SUBMIT BUTTON */}
+        {/* ========================= */}
+
         <div className="md:col-span-2">
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-2xl font-bold text-lg flex justify-center items-center gap-3 hover:scale-[1.02] transition duration-300 disabled:opacity-50"
+            className="
+              flex
+              w-full
+              items-center
+              justify-center
+              gap-3
+              rounded-xl
+              sm:rounded-2xl
+              bg-gradient-to-r
+              from-blue-600
+              to-indigo-600
+              py-3
+              sm:py-4
+              text-base
+              sm:text-lg
+              font-bold
+              text-white
+              transition-all
+              duration-300
+              hover:scale-[1.01]
+              hover:from-blue-700
+              hover:to-indigo-700
+              active:scale-[0.99]
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+              disabled:hover:scale-100
+            "
           >
             <FaPlusCircle />
-            {loading ? "Adding..." : "Add Expense"}
+
+            {loading
+              ? "Adding..."
+              : "Add Expense"}
           </button>
+
         </div>
       </form>
     </div>

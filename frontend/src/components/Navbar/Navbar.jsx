@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+
 import {
   FaBell,
   FaSearch,
@@ -11,7 +12,7 @@ import {
   FaQuestionCircle,
 } from "react-icons/fa";
 
-const Navbar = ({ search, setSearch }) => {
+const Navbar = ({ search = "", setSearch = () => {} }) => {
   const navigate = useNavigate();
 
   const [showNotifications, setShowNotifications] = useState(false);
@@ -27,6 +28,7 @@ const Navbar = ({ search, setSearch }) => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+
     navigate("/login");
   };
 
@@ -35,49 +37,72 @@ const Navbar = ({ search, setSearch }) => {
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="sticky top-0 z-50 flex h-20 items-center justify-between border-b border-white/10 bg-slate-900/70 px-8 backdrop-blur-xl shadow-xl"
+      className="
+        sticky top-0 z-40
+        flex h-20 items-center justify-between
+        border-b border-white/10
+        bg-slate-900/70
+        px-4 sm:px-6 md:px-8
+        backdrop-blur-xl
+        shadow-xl
+      "
     >
-      {/* Left Side */}
-      <div>
-        <h1 className="text-3xl font-bold text-white">
+      {/* ========================= */}
+      {/* LEFT SIDE */}
+      {/* ========================= */}
+
+      <div className="min-w-0">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white truncate">
           Dashboard
         </h1>
 
-        <p className="text-slate-400">
+        <p className="hidden sm:block text-sm md:text-base text-slate-400">
           Welcome back 👋
         </p>
       </div>
 
-      {/* Right Side */}
-      <div className="flex items-center gap-6">
+      {/* ========================= */}
+      {/* RIGHT SIDE */}
+      {/* ========================= */}
 
-        {/* Search */}
-        <div className="relative">
+      <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
 
-          <motion.div
-            animate={{
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              repeat: Infinity,
-              duration: 2,
-            }}
-            className="absolute left-4 top-4 text-slate-400"
-          >
-            <FaSearch />
-          </motion.div>
+        {/* ========================= */}
+        {/* SEARCH */}
+        {/* ========================= */}
+
+        <div className="relative hidden sm:block">
+
+          <FaSearch className="absolute left-4 top-4 text-slate-400" />
 
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
-            className="w-72 rounded-xl border border-white/10 bg-slate-800/80 py-3 pl-11 pr-4 text-white placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/40"
+            className="
+              w-40 md:w-56 lg:w-72
+              rounded-xl
+              border border-white/10
+              bg-slate-800/80
+              py-3 pl-11 pr-4
+              text-white
+              placeholder:text-slate-400
+              outline-none
+              transition-all
+              duration-300
+              focus:border-violet-500
+              focus:ring-2
+              focus:ring-violet-500/40
+            "
           />
 
         </div>
 
-        {/* Notifications */}
+        {/* ========================= */}
+        {/* NOTIFICATIONS */}
+        {/* ========================= */}
+
         <div className="relative">
 
           <motion.div
@@ -88,15 +113,16 @@ const Navbar = ({ search, setSearch }) => {
             whileTap={{
               scale: 0.9,
             }}
-            className="relative cursor-pointer"
+            className="relative cursor-pointer p-2"
             onClick={() => {
               setShowNotifications(!showNotifications);
               setShowProfile(false);
             }}
           >
+
             <FaBell
-              size={24}
-              className="text-white"
+              size={21}
+              className="text-white sm:w-6 sm:h-6"
             />
 
             <motion.span
@@ -107,12 +133,27 @@ const Navbar = ({ search, setSearch }) => {
                 repeat: Infinity,
                 duration: 1.5,
               }}
-              className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+              className="
+                absolute
+                -right-1
+                -top-1
+                flex
+                h-5
+                w-5
+                items-center
+                justify-center
+                rounded-full
+                bg-red-500
+                text-xs
+                text-white
+              "
             >
               {notifications.length}
             </motion.span>
 
           </motion.div>
+
+          {/* Notifications Dropdown */}
 
           <AnimatePresence>
 
@@ -134,7 +175,24 @@ const Navbar = ({ search, setSearch }) => {
                 transition={{
                   duration: 0.25,
                 }}
-                className="absolute right-0 mt-5 w-80 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-2xl"
+                className="
+                  fixed
+                  right-3
+                  top-20
+                  w-[calc(100vw-24px)]
+                  max-w-80
+                  overflow-hidden
+                  rounded-2xl
+                  border
+                  border-white/10
+                  bg-slate-900
+                  shadow-2xl
+                  sm:absolute
+                  sm:right-0
+                  sm:top-auto
+                  sm:mt-5
+                  sm:w-80
+                "
               >
 
                 <div className="border-b border-white/10 p-4">
@@ -147,7 +205,16 @@ const Navbar = ({ search, setSearch }) => {
 
                   <div
                     key={index}
-                    className="border-b border-white/10 px-4 py-4 text-slate-300 transition hover:bg-white/10"
+                    className="
+                      border-b
+                      border-white/10
+                      px-4
+                      py-4
+                      text-sm
+                      text-slate-300
+                      transition
+                      hover:bg-white/10
+                    "
                   >
                     {item}
                   </div>
@@ -158,7 +225,17 @@ const Navbar = ({ search, setSearch }) => {
                   onClick={() =>
                     setShowNotifications(false)
                   }
-                  className="w-full bg-gradient-to-r from-violet-600 to-blue-600 py-3 font-semibold text-white transition hover:opacity-90"
+                  className="
+                    w-full
+                    bg-gradient-to-r
+                    from-violet-600
+                    to-blue-600
+                    py-3
+                    font-semibold
+                    text-white
+                    transition
+                    hover:opacity-90
+                  "
                 >
                   Mark All as Read
                 </button>
@@ -170,7 +247,11 @@ const Navbar = ({ search, setSearch }) => {
           </AnimatePresence>
 
         </div>
-                {/* Profile */}
+
+        {/* ========================= */}
+        {/* PROFILE */}
+        {/* ========================= */}
+
         <div className="relative">
 
           <motion.div
@@ -187,11 +268,15 @@ const Navbar = ({ search, setSearch }) => {
               setShowNotifications(false);
             }}
           >
+
             <FaUserCircle
-              size={38}
-              className="text-violet-400"
+              size={35}
+              className="text-violet-400 sm:w-10 sm:h-10"
             />
+
           </motion.div>
+
+          {/* Profile Dropdown */}
 
           <AnimatePresence>
 
@@ -213,10 +298,28 @@ const Navbar = ({ search, setSearch }) => {
                 transition={{
                   duration: 0.25,
                 }}
-                className="absolute right-0 mt-5 w-72 overflow-hidden rounded-2xl border border-white/10 bg-slate-900 shadow-2xl"
+                className="
+                  fixed
+                  right-3
+                  top-20
+                  w-[calc(100vw-24px)]
+                  max-w-72
+                  overflow-hidden
+                  rounded-2xl
+                  border
+                  border-white/10
+                  bg-slate-900
+                  shadow-2xl
+                  sm:absolute
+                  sm:right-0
+                  sm:top-auto
+                  sm:mt-5
+                  sm:w-72
+                "
               >
 
                 {/* Profile Header */}
+
                 <div className="border-b border-white/10 p-5">
 
                   <div className="flex items-center gap-3">
@@ -226,60 +329,109 @@ const Navbar = ({ search, setSearch }) => {
                       className="text-violet-400"
                     />
 
-                    <div>
-                      <h3 className="text-lg font-bold text-white">
+                    <div className="min-w-0">
+
+                      <h3 className="text-lg font-bold text-white truncate">
                         Atharva Nikam
                       </h3>
 
                       <p className="text-sm text-slate-400">
                         AI / ML Developer
                       </p>
+
                     </div>
 
                   </div>
 
                 </div>
 
-                {/* Menu */}
+                {/* My Profile */}
 
                 <button
                   onClick={() => {
                     navigate("/profile");
                     setShowProfile(false);
                   }}
-                  className="flex w-full items-center gap-3 px-5 py-4 text-white transition hover:bg-white/10"
+                  className="
+                    flex
+                    w-full
+                    items-center
+                    gap-3
+                    px-5
+                    py-4
+                    text-white
+                    transition
+                    hover:bg-white/10
+                  "
                 >
                   <FaUser />
                   My Profile
                 </button>
+
+                {/* Settings */}
 
                 <button
                   onClick={() => {
                     navigate("/settings");
                     setShowProfile(false);
                   }}
-                  className="flex w-full items-center gap-3 px-5 py-4 text-white transition hover:bg-white/10"
+                  className="
+                    flex
+                    w-full
+                    items-center
+                    gap-3
+                    px-5
+                    py-4
+                    text-white
+                    transition
+                    hover:bg-white/10
+                  "
                 >
                   <FaCog />
                   Settings
                 </button>
+
+                {/* Help */}
 
                 <button
                   onClick={() => {
                     navigate("/help");
                     setShowProfile(false);
                   }}
-                  className="flex w-full items-center gap-3 px-5 py-4 text-white transition hover:bg-white/10"
+                  className="
+                    flex
+                    w-full
+                    items-center
+                    gap-3
+                    px-5
+                    py-4
+                    text-white
+                    transition
+                    hover:bg-white/10
+                  "
                 >
                   <FaQuestionCircle />
                   Help Center
                 </button>
 
+                {/* Logout */}
+
                 <div className="border-t border-white/10">
 
                   <button
                     onClick={handleLogout}
-                    className="flex w-full items-center gap-3 bg-red-600 px-5 py-4 text-white transition hover:bg-red-700"
+                    className="
+                      flex
+                      w-full
+                      items-center
+                      gap-3
+                      bg-red-600
+                      px-5
+                      py-4
+                      text-white
+                      transition
+                      hover:bg-red-700
+                    "
                   >
                     <FaSignOutAlt />
                     Logout

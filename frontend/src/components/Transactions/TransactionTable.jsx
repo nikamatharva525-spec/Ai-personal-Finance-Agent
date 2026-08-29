@@ -9,6 +9,9 @@ const TransactionTable = ({
   refreshTransactions,
   onEdit,
 }) => {
+  // =========================
+  // DELETE TRANSACTION
+  // =========================
 
   const handleDelete = async (item) => {
     const confirmDelete = window.confirm(
@@ -18,7 +21,6 @@ const TransactionTable = ({
     if (!confirmDelete) return;
 
     try {
-
       if (item.type === "Expense") {
         await deleteExpense(item._id);
       } else {
@@ -28,40 +30,143 @@ const TransactionTable = ({
       alert("Transaction deleted successfully.");
 
       if (refreshTransactions) {
-        refreshTransactions();
+        await refreshTransactions();
       } else {
         window.location.reload();
       }
-
     } catch (error) {
-      console.error(error);
-      alert("Failed to delete transaction.");
+      console.error(
+        "Delete Transaction Error:",
+        error.response?.data || error
+      );
+
+      alert(
+        error.response?.data?.message ||
+          "Failed to delete transaction."
+      );
     }
   };
 
-  return (
-    <div className="bg-slate-800 rounded-2xl p-5 shadow-lg">
+  // =========================
+  // FORMAT DATE
+  // =========================
 
-      <h2 className="text-2xl font-bold text-white mb-5">
+  const formatDate = (date) => {
+    if (!date) return "-";
+
+    return new Date(date).toLocaleDateString(
+      "en-IN",
+      {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }
+    );
+  };
+
+  // =========================
+  // FORMAT AMOUNT
+  // =========================
+
+  const formatAmount = (amount) => {
+    return Number(amount || 0).toLocaleString(
+      "en-IN"
+    );
+  };
+
+  return (
+    <div
+      className="
+        w-full
+        min-w-0
+        overflow-hidden
+        rounded-2xl
+        bg-slate-800
+        p-4
+        sm:p-5
+        shadow-lg
+      "
+    >
+      {/* ========================= */}
+      {/* TITLE */}
+      {/* ========================= */}
+
+      <h2
+        className="
+          mb-5
+          text-xl
+          sm:text-2xl
+          font-bold
+          text-white
+        "
+      >
         Transaction History
       </h2>
 
-      <div className="overflow-x-auto">
+      {/* ========================= */}
+      {/* TABLE WRAPPER */}
+      {/* ========================= */}
 
-        <table className="w-full text-white border-collapse">
+      <div
+        className="
+          w-full
+          overflow-x-auto
+          rounded-xl
+        "
+      >
+        <table
+          className="
+            w-full
+            min-w-[850px]
+            border-collapse
+            text-white
+          "
+        >
+          {/* ========================= */}
+          {/* TABLE HEADER */}
+          {/* ========================= */}
 
           <thead>
             <tr className="bg-slate-700">
-              <th className="p-3">Date</th>
-              <th className="p-3">Title</th>
-              <th className="p-3">Type</th>
-              <th className="p-3">Category</th>
-              <th className="p-3">Amount</th>
-              <th className="p-3">Payment</th>
-              <th className="p-3">Edit</th>
-              <th className="p-3">Delete</th>
+
+              <th className="whitespace-nowrap p-3 text-left text-sm">
+                Date
+              </th>
+
+              <th className="whitespace-nowrap p-3 text-left text-sm">
+                Title
+              </th>
+
+              <th className="whitespace-nowrap p-3 text-left text-sm">
+                Type
+              </th>
+
+              <th className="whitespace-nowrap p-3 text-left text-sm">
+                Category
+              </th>
+
+              <th className="whitespace-nowrap p-3 text-right text-sm">
+                Amount
+              </th>
+
+              <th className="whitespace-nowrap p-3 text-left text-sm">
+                Payment
+              </th>
+
+              <th className="whitespace-nowrap p-3 text-center text-sm">
+                Edit
+              </th>
+
+              <th className="whitespace-nowrap p-3 text-center text-sm">
+                Delete
+              </th>
+
             </tr>
           </thead>
+
+          {/* ========================= */}
+          {/* TABLE BODY */}
+          {/* ========================= */}
 
           <tbody>
 
@@ -70,7 +175,12 @@ const TransactionTable = ({
               <tr>
                 <td
                   colSpan="8"
-                  className="text-center py-8 text-gray-400"
+                  className="
+                    py-10
+                    text-center
+                    text-sm
+                    text-gray-400
+                  "
                 >
                   No Transactions Found
                 </td>
@@ -81,81 +191,178 @@ const TransactionTable = ({
               transactions.map((item, index) => (
 
                 <tr
-  key={item._id || index}
-  className="border-b border-slate-700 hover:bg-slate-700 transition"
->
+                  key={item._id || index}
+                  className="
+                    border-b
+                    border-slate-700
+                    transition
+                    hover:bg-slate-700
+                  "
+                >
 
-  <td className="p-3">
-    {item.date
-      ? new Date(item.date).toLocaleDateString()
-      : "-"}
-  </td>
+                  {/* DATE */}
 
-  <td className="p-3">
-    {item.title}
-  </td>
+                  <td className="whitespace-nowrap p-3 text-sm">
+                    {formatDate(item.date)}
+                  </td>
 
-  <td className="p-3">
-    <span
-      className={`px-3 py-1 rounded-full text-sm font-semibold ${
-        item.type === "Income"
-          ? "bg-green-600 text-white"
-          : "bg-red-600 text-white"
-      }`}
-    >
-      {item.type}
-    </span>
-  </td>
+                  {/* TITLE */}
 
-  <td className="p-3">{item.category}</td>
+                  <td className="max-w-[180px] p-3 text-sm">
+                    <div className="break-words">
+                      {item.title || "-"}
+                    </div>
+                  </td>
 
-  <td
-    className={`p-3 font-bold ${
-      item.type === "Income"
-        ? "text-green-400"
-        : "text-red-400"
-    }`}
-  >
-    {item.type === "Income" ? "+" : "-"}₹{item.amount}
-  </td>
+                  {/* TYPE */}
 
-  <td className="p-3">
-    {item.payment || "-"}
-  </td>
+                  <td className="p-3">
 
- <td className="p-3 text-center">
-  <button
-    onClick={() => {
-      console.log("✅ Edit button clicked");
-      console.log(item);
-      onEdit(item);
-    }}
-    className="text-blue-400 hover:text-blue-600"
-  >
-    <FaEdit />
-  </button>
-</td>
+                    <span
+                      className={`
+                        inline-flex
+                        whitespace-nowrap
+                        rounded-full
+                        px-3
+                        py-1
+                        text-xs
+                        sm:text-sm
+                        font-semibold
+                        ${
+                          item.type === "Income"
+                            ? "bg-green-600 text-white"
+                            : "bg-red-600 text-white"
+                        }
+                      `}
+                    >
+                      {item.type}
+                    </span>
 
-  <td className="p-3 text-center">
-    <button
-      onClick={() => handleDelete(item)}
-      className="text-red-400 hover:text-red-600"
-    >
-      <FaTrash />
-     </button>
-     </td>
+                  </td>
 
-     </tr>
+                  {/* CATEGORY */}
 
-     ))
+                  <td className="max-w-[150px] p-3 text-sm">
+                    <div className="break-words">
+                      {item.category || "-"}
+                    </div>
+                  </td>
 
-     )}
+                  {/* AMOUNT */}
 
-     </tbody>
+                  <td
+                    className={`
+                      whitespace-nowrap
+                      p-3
+                      text-right
+                      text-sm
+                      font-bold
+                      ${
+                        item.type === "Income"
+                          ? "text-green-400"
+                          : "text-red-400"
+                      }
+                    `}
+                  >
+                    {item.type === "Income"
+                      ? "+"
+                      : "-"}
+                    ₹{formatAmount(item.amount)}
+                  </td>
 
-     </table>
+                  {/* PAYMENT */}
 
-     </div>
+                  <td className="whitespace-nowrap p-3 text-sm">
+                    {item.payment || "-"}
+                  </td>
+
+                  {/* EDIT */}
+
+                  <td className="p-3 text-center">
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        console.log(
+                          "Edit button clicked:",
+                          item
+                        );
+
+                        if (onEdit) {
+                          onEdit(item);
+                        }
+                      }}
+                      aria-label="Edit transaction"
+                      className="
+                        inline-flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-blue-500/10
+                        text-blue-400
+                        transition
+                        hover:bg-blue-500/20
+                        hover:text-blue-300
+                        active:scale-95
+                      "
+                    >
+                      <FaEdit size={16} />
+                    </button>
+
+                  </td>
+
+                  {/* DELETE */}
+
+                  <td className="p-3 text-center">
+
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleDelete(item)
+                      }
+                      aria-label="Delete transaction"
+                      className="
+                        inline-flex
+                        h-9
+                        w-9
+                        items-center
+                        justify-center
+                        rounded-lg
+                        bg-red-500/10
+                        text-red-400
+                        transition
+                        hover:bg-red-500/20
+                        hover:text-red-300
+                        active:scale-95
+                      "
+                    >
+                      <FaTrash size={16} />
+                    </button>
+
+                  </td>
+
+                </tr>
+
+              ))
+
+            )}
+
+          </tbody>
+        </table>
+      </div>
+
+      {/* ========================= */}
+      {/* MOBILE HINT */}
+      {/* ========================= */}
+
+      {transactions.length > 0 && (
+        <p className="mt-3 text-center text-xs text-slate-500 sm:hidden">
+          Swipe left or right to view all transaction
+          details.
+        </p>
+      )}
 
     </div>
   );
