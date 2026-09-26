@@ -7,20 +7,20 @@ import { useNavigate } from "react-router-dom";
 const SocialLogin = () => {
   const navigate = useNavigate();
 
-  // Google Login Success
+  // =========================
+  // GOOGLE LOGIN
+  // =========================
   const handleGoogleSuccess = (credentialResponse) => {
     try {
       const user = jwtDecode(credentialResponse.credential);
 
       console.log("Google User:", user);
 
-      // Save Google user
       localStorage.setItem(
         "googleUser",
         JSON.stringify(user)
       );
 
-      // Save Google JWT token
       localStorage.setItem(
         "googleToken",
         credentialResponse.credential
@@ -28,19 +28,42 @@ const SocialLogin = () => {
 
       alert(`Welcome ${user.name}`);
 
-      // Redirect to Dashboard
       navigate("/dashboard");
-
     } catch (error) {
       console.error("Google Login Error:", error);
       alert("Google Login Failed");
     }
   };
 
-  // Google Login Failed
   const handleGoogleError = () => {
     console.error("Google Login Failed");
     alert("Google Login Failed");
+  };
+
+  // =========================
+  // FACEBOOK LOGIN
+  // =========================
+  const handleFacebookLogin = () => {
+    const fbAppId =
+      import.meta.env.VITE_FACEBOOK_APP_ID;
+
+    if (!fbAppId) {
+      alert("Facebook App ID is missing.");
+      return;
+    }
+
+    const redirectUri = window.location.origin;
+
+    const facebookLoginUrl =
+      `https://www.facebook.com/v23.0/dialog/oauth` +
+      `?client_id=${encodeURIComponent(fbAppId)}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=public_profile`;
+
+    console.log("Facebook Login URL:", facebookLoginUrl);
+
+    window.location.href = facebookLoginUrl;
   };
 
   return (
@@ -76,8 +99,18 @@ const SocialLogin = () => {
         <button
           type="button"
           onClick={() => {
+            const githubClientId =
+              import.meta.env.VITE_GITHUB_CLIENT_ID;
+
+            if (!githubClientId) {
+              alert("GitHub Client ID is missing.");
+              return;
+            }
+
             window.location.href =
-              "https://github.com/login/oauth/authorize?client_id=Ov23liEisadFlVvdhjVB";
+              `https://github.com/login/oauth/authorize?client_id=${encodeURIComponent(
+                githubClientId
+              )}`;
           }}
           className="flex items-center justify-center h-12 rounded-xl bg-white/10 border border-white/10 hover:bg-gray-700 transition duration-300"
         >
@@ -87,17 +120,13 @@ const SocialLogin = () => {
         {/* Facebook */}
         <button
           type="button"
-          onClick={() => {
-            window.location.href =
-              "https://www.facebook.com/v23.0/dialog/oauth?client_id=1009752718710695&redirect_uri=http://localhost:5173&response_type=code&scope=email,public_profile";
-          }}
+          onClick={handleFacebookLogin}
           className="flex items-center justify-center h-12 rounded-xl bg-white/10 border border-white/10 hover:bg-blue-600 transition duration-300"
         >
           <FaFacebookF className="text-white text-xl" />
         </button>
 
       </div>
-
     </div>
   );
 };

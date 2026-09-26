@@ -1,23 +1,28 @@
 import Expense from "../models/Expense.js";
+import Income from "../models/Income.js";
 
 export const getDashboardData = async (req, res) => {
   try {
-    const expenses = await Expense.find();
+    const [expenses, incomes] = await Promise.all([
+      Expense.find(),
+      Income.find(),
+    ]);
 
     let totalExpense = 0;
-
     expenses.forEach((expense) => {
-      totalExpense += expense.amount;
+      totalExpense += Number(expense.amount || 0);
     });
 
-    // Example values
-    const totalIncome = 80000;
+    let totalIncome = 0;
+    incomes.forEach((income) => {
+      totalIncome += Number(income.amount || 0);
+    });
 
-    const totalSavings = totalIncome - totalExpense;
-
-    const totalBalance = totalSavings;
+    const totalBalance = totalIncome - totalExpense;
+    const totalSavings = totalBalance;
 
     res.status(200).json({
+      success: true,
       totalBalance,
       totalIncome,
       totalExpense,
@@ -26,6 +31,7 @@ export const getDashboardData = async (req, res) => {
 
   } catch (error) {
     res.status(500).json({
+      success: false,
       message: error.message,
     });
   }

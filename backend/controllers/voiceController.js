@@ -1,3 +1,21 @@
+import OpenAI from "openai";
+import Expense from "../models/Expense.js";
+
+const nvidiaApiKey = process.env.NVIDIA_API_KEY;
+const openRouterApiKey = process.env.OPENROUTER_API_KEY;
+
+const aiClient = new OpenAI(
+  nvidiaApiKey
+    ? {
+        apiKey: nvidiaApiKey,
+        baseURL: "https://integrate.api.nvidia.com/v1",
+      }
+    : {
+        apiKey: openRouterApiKey,
+        baseURL: "https://openrouter.ai/api/v1",
+      }
+);
+
 export const processVoice = async (req, res) => {
   try {
     const { message } = req.body;
@@ -184,8 +202,12 @@ export const processVoice = async (req, res) => {
     // NVIDIA AI
     // ==========================================
 
-    const completion = await nvidia.chat.completions.create({
-      model: "meta/llama-3.1-8b-instruct",
+    const model = nvidiaApiKey
+      ? "meta/llama-3.1-8b-instruct"
+      : "meta-llama/llama-3.3-70b-instruct";
+
+    const completion = await aiClient.chat.completions.create({
+      model,
       messages: [
         {
           role: "system",

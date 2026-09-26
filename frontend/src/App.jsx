@@ -42,7 +42,6 @@ function App() {
       <Route path="/edit-profile" element={<EditProfile />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/help" element={<Help />} />
-      <Route path="/analytics" element={<Analytics />} />
 
       {/* 404 Page */}
       <Route

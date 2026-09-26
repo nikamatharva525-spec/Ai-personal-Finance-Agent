@@ -28,11 +28,16 @@ export const registerUser = async (req, res) => {
       password: hashedPassword,
     });
 
-    console.log("✅ Registered User:", user);
+    console.log("✅ Registered User:", user.email);
 
     res.status(201).json({
       message: "User registered successfully",
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "",
+      },
     });
 
   } catch (error) {
@@ -94,7 +99,12 @@ export const loginUser = async (req, res) => {
     res.status(200).json({
       message: "Login successful",
       token,
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone || "",
+      },
     });
 
   } catch (error) {

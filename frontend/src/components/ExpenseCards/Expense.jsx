@@ -1,4 +1,4 @@
-import ExpenseCards from "../components/ExpenseCards/ExpenseCards";
+import ExpenseCards from "./ExpenseCards";
 
 function Expense() {
   return (
